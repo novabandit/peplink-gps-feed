@@ -1,6 +1,6 @@
 # Troubleshooting and gotchas
 
-These are the snags this build actually hit, with the reason behind each. Most of them are easy once you know to expect them.
+These are the snags worth expecting on this build, with the reason behind each. Most of them are easy once you know to expect them.
 
 ## 1. Listener vs client (the conceptual one)
 
@@ -25,15 +25,15 @@ The WT32-ETH01 has **no USB port** and **no auto-reset circuit**, so you cannot 
 3. When the IDE prints `Connecting....`, **power-cycle the board** (pull and restore its power). It catches the chip in download mode and flashes.
 4. When the flash finishes, **remove the IO0 jumper** and power-cycle again to run normally.
 
-## 4. The FTDI VCC backfeed that starves the Ethernet PHY (the nasty one)
+## 4. FTDI VCC left connected during operation backfeeds the rail (the nasty one)
 
 Symptom: the board flashes perfectly, the firmware runs, the serial console looks healthy, but the **Ethernet link light never comes on** and you never get a DHCP IP.
 
-Cause: powering the board's 3.3V rail from the **FTDI's VCC** pin backfeeds the onboard regulator and **sags the rail**. The LAN8720 Ethernet PHY is power-hungry, and on that sagging rail it never comes up, so you get no link.
+Cause: during flashing it is correct to power the board from the **FTDI's VCC into the 3V3 pin** (the Ethernet PHY is idle then, so the FTDI supplies enough current). The trouble starts at the transition to operation. When you bring in the buck's **5V** on the 5V pin but leave the **FTDI VCC wire still connected**, two supplies share the rail: the FTDI's 3.3V and the buck's 5V through the onboard regulator. They backfeed and **sag the rail**. The LAN8720 Ethernet PHY is power-hungry, and on that sagging rail it never comes up, so you get no link.
 
-Fix: **disconnect the FTDI VCC wire** and power the board from a solid **5V** source (the buck, or a USB charger) into the WT32's **5V** pin. The onboard regulator then feeds the rail properly and the PHY links up. Once we pulled FTDI VCC and fed clean 5V, the board pulled DHCP immediately and the Peplink logged the port link-up at 100 Mbps full duplex.
+Fix: when you switch to 5V for operation, **remove the FTDI VCC wire** (keep GND/TX/RX if you want the serial console) and power the board from a solid **5V** source (the buck, or a USB charger) into the WT32's **5V** pin. With FTDI VCC removed and clean 5V in, the board pulls DHCP immediately and the Peplink logs the port link-up at 100 Mbps full duplex.
 
-This is the single most common "it all works except Ethernet" failure on this board. If your link light is dark, check this first.
+The rule is "power from the FTDI to flash, then disconnect FTDI VCC when you switch to 5V for operation," not "never connect FTDI VCC." This is the single most common "it all works except Ethernet" failure on this board. If your link light is dark after you have moved to 5V, check this first.
 
 ## 5. IO5 is a strapping pin
 

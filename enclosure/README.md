@@ -1,6 +1,6 @@
 # Enclosure
 
-3D-printable case and lid for the electronics. License: CC BY-SA 4.0 (see `../LICENSE-hardware`).
+3D-printable case and lid for the electronics. License: CC BY-NC-SA 4.0 (see `../LICENSE-hardware`). This is a remix of upstream NonCommercial work, so the NonCommercial terms carry through; see the credit lineage below.
 
 ## Printable files
 
@@ -23,3 +23,13 @@ The GPS can be **fully enclosed** with no opening to the sky, because it runs of
 ## What is intentionally omitted
 
 The original narrower case and the intermediate widened versions are **not included on purpose**, to avoid confusion about which file to print. The two files above supersede all of them. If you specifically want the GPS-less original box for a different build, it is straightforward to print just the WT32 + FTDI footprint, but this repo ships only the final motorhome-GPS enclosure.
+
+## Credits and license lineage
+
+These STLs are a remix, and the whole lineage is licensed **CC BY-NC-SA 4.0** (Attribution, NonCommercial, ShareAlike). The chain:
+
+1. **Original:** Hans (username @Hans_193091), "Esp32 WT32-ETH01 USB Type C Snap Fit Case" on Printables. https://www.printables.com/model/770916-esp32-wt32-eth01-usb-type-c-snap-fit-case
+2. **Remix this build started from:** Jahara, "WT32-ETH01 FT232 Snap Fit Case" on MakerWorld. https://makerworld.com/en/models/1920953-wt32-eth01-ft232-snap-fit-case
+3. **This version:** Jahara's case widened by 30mm along the connector-wall axis to fit the NEO-7M, with the internal partition wall removed.
+
+Because the upstream work is **NonCommercial**, these models and the documentation that ships with them may not be used commercially. Because it is **ShareAlike**, any further remix must carry the same CC BY-NC-SA 4.0 license and preserve this attribution chain. License text: https://creativecommons.org/licenses/by-nc-sa/4.0/

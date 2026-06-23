@@ -24,19 +24,20 @@ At the top of the sketch, set:
 
 The GPS pin and baud defines (`GPS_RX_PIN 5`, `GPS_TX_PIN 17`, `GPS_BAUD 9600`) and the LAN8720 Ethernet defines are correct for the WT32-ETH01 and should be left as-is.
 
-## FTDI wiring for flashing (VCC disconnected)
+## FTDI wiring for flashing (power from FTDI VCC, remove it for operation)
 
 Flash through the FTDI on UART0 with the **FTDI switch set to 3.3V**:
 
 | FTDI | -> | WT32-ETH01 |
 |---|---|---|
+| VCC | -> | 3V3  (powers the board for flashing) |
 | GND | -> | GND |
 | TXD | -> | RX0  (silk "RXO") |
 | RXD | -> | TX0  (silk "TXO") |
 
 Plus the bootloader jumper **IO0 -> GND**.
 
-> **Leave FTDI VCC disconnected.** Power the board from a 5V source (the buck or a USB charger) into the WT32 **5V** pin. Backfeeding the 3.3V rail from FTDI VCC sags it and stops the Ethernet PHY from coming up. See `../docs/troubleshooting.md`.
+> **Power from the FTDI to flash, then disconnect FTDI VCC when you switch to 5V for operation.** With the FTDI switch at 3.3V, feed **FTDI VCC into the WT32 3V3 pin** to power the board while flashing. This works because the Ethernet PHY is idle during the flash. When you move to operation and power the board from the buck's **5V** on the **5V** pin, **remove the FTDI VCC wire** (keep GND/TX/RX if you still want the serial console). Leaving FTDI VCC connected alongside the 5V supply backfeeds and sags the rail, which starves the power-hungry Ethernet PHY so the link never comes up. See `../docs/troubleshooting.md`.
 >
 > Also **disconnect the GPS while flashing** (IO5 is a strapping pin).
 

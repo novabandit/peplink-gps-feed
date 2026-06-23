@@ -51,19 +51,20 @@ The WT32-ETH01 has **no USB port**, so you flash it through the FTDI on UART0. *
 
 | FTDI | -> | WT32-ETH01 |
 |---|---|---|
+| VCC | -> | 3V3  (powers the board for flashing) |
 | GND | -> | GND |
 | TXD | -> | RX0  (silk "RXO") |
 | RXD | -> | TX0  (silk "TXO") |
 
 Plus a jumper: **IO0 -> GND** (this is what selects flash mode). TX and RX cross over.
 
-> **Do not connect FTDI VCC here.** Power the board for flashing from the buck's 5V (or a USB charger) into the WT32 **5V** pin, and leave the **FTDI VCC wire off**. Feeding the board's 3.3V rail from the FTDI's VCC backfeeds the onboard regulator, sags the rail, and starves the Ethernet PHY, which is the classic "everything flashes fine but the link light never comes on" failure. This is the single most common snag on this board, see `troubleshooting.md`. (If you have no other 5V at the bench, you can flash off the FTDI's 3V3 pin only because the Ethernet is idle during the flash, but switch to a real 5V source before you expect a link.)
+> **Power the board from the FTDI to flash, then disconnect FTDI VCC when you switch to 5V for operation.** With the FTDI switch at 3.3V, feed **FTDI VCC into the WT32 3V3 pin** to power the board for flashing. This is fine because the Ethernet PHY is idle while flashing, so the modest current the FTDI supplies is enough. The critical step is the transition to operation: when you move to stage C and power the board from the buck's **5V** into the **5V** pin, you must **remove the FTDI VCC wire** (keep GND/TX/RX if you still want the serial console). Leaving FTDI VCC connected puts two supplies on the rail, the FTDI's 3.3V and the buck's 5V through the onboard regulator, and they backfeed and sag it. The power-hungry LAN8720 PHY is then starved and the Ethernet link never comes up. That is the classic "everything flashes fine but the link light never comes on" failure. See `troubleshooting.md`.
 
 For the manual-bootloader keystrokes, see `../firmware/README.md`.
 
 ## Stage C: operation, GPS to WT32
 
-After flashing, remove the IO0 jumper and wire the GPS to UART2.
+After flashing, remove the IO0 jumper, remove the **FTDI VCC wire**, and wire the GPS to UART2.
 
 | NEO-7M | -> | WT32-ETH01 |
 |---|---|---|
@@ -74,7 +75,7 @@ After flashing, remove the IO0 jumper and wire the GPS to UART2.
 
 Leave **PPS** open. TX and RX cross over here too: the GPS's TXD goes to IO5.
 
-Power the GPS from the WT32's **3V3** output pin, not 5V. That keeps an active 3.3V-bias antenna at its rated voltage. The chain is: **5V in -> WT32 -> 3V3 out -> GPS.**
+Power the WT32 from the buck's **5V** into the WT32 **5V** pin, with the FTDI VCC wire removed so only one supply feeds the rail. Power the GPS from the WT32's **3V3** output pin, not 5V. That keeps an active 3.3V-bias antenna at its rated voltage. The chain is: **5V in -> WT32 -> 3V3 out -> GPS.** If you keep the FTDI attached for the serial console, leave only GND/TX/RX connected, never VCC.
 
 ## Final install power
 

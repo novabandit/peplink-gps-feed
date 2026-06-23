@@ -1,13 +1,29 @@
 The 3D models in `enclosure/` and the documentation in `docs/` and `README.md`
-are licensed under the Creative Commons Attribution-ShareAlike 4.0
-International License (CC BY-SA 4.0).
+are licensed under the Creative Commons
+Attribution-NonCommercial-ShareAlike 4.0 International License
+(CC BY-NC-SA 4.0).
 
-You are free to share and adapt them for any purpose, including commercially,
-as long as you give appropriate credit and license your derivatives under the
-same terms.
+You are free to share and adapt them for NONCOMMERCIAL purposes only, as long
+as you give appropriate credit and license your derivatives under the same
+terms. Commercial use is NOT permitted.
 
-Full license text: https://creativecommons.org/licenses/by-sa/4.0/legalcode
-Summary: https://creativecommons.org/licenses/by-sa/4.0/
+Full license text: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+Summary: https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-The firmware in `firmware/` is licensed separately under the MIT License; see
-the `LICENSE` file.
+Attribution and lineage. The enclosure STLs are a remix, and the NonCommercial
+terms carry through from the upstream sources:
+
+  - Original: Hans (username @Hans_193091), "Esp32 WT32-ETH01 USB Type C Snap
+    Fit Case" on Printables, CC BY-NC-SA 4.0.
+    https://www.printables.com/model/770916-esp32-wt32-eth01-usb-type-c-snap-fit-case
+
+  - Remix this build started from: Jahara, "WT32-ETH01 FT232 Snap Fit Case" on
+    MakerWorld, CC BY-NC-SA 4.0.
+    https://makerworld.com/en/models/1920953-wt32-eth01-ft232-snap-fit-case
+
+  - This version: Jahara's case widened by 30mm for the NEO-7M, with an
+    internal partition removed. Licensed CC BY-NC-SA 4.0 to match upstream.
+
+The firmware in `firmware/` is licensed separately under the MIT License and is
+original work, unaffected by the NonCommercial terms above; see the `LICENSE`
+file.

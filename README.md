@@ -2,7 +2,7 @@
 
 A cheap, reliable way to give a Peplink router a live GPS position again by feeding it raw NMEA 0183 over the LAN. A small ESP32-with-Ethernet board reads a real GPS receiver and pushes the stream to the router. Total parts cost is roughly $40, less if you already own a USB-to-serial adapter.
 
-> **Licenses:** firmware in `firmware/` is MIT (`LICENSE`). The 3D models in `enclosure/` and the documentation in `docs/` and this README are CC BY-SA 4.0 (`LICENSE-hardware`).
+> **Licenses:** firmware in `firmware/` is MIT (`LICENSE`). The 3D models in `enclosure/`, the documentation in `docs/`, and this README are CC BY-NC-SA 4.0 (`LICENSE-hardware`). The enclosure is a remix of upstream NonCommercial work, so the NonCommercial terms apply to the models and docs; the firmware is original and stays MIT.
 
 ## The problem
 
@@ -63,7 +63,7 @@ Full detail, pin by pin and stage by stage, is in **`docs/wiring.md`**. In brief
 - There are three wiring stages and you do not need them all at once: **(A)** bench-test the GPS by itself over the FTDI, **(B)** flash the WT32-ETH01 over the FTDI on UART0, **(C)** operation, with the GPS on UART2.
 - The GPS talks to the WT32 on **UART2**: GPS **TXD -> IO5** (board silk "RXD"), and optionally GPS **RXD -> IO17** (board silk "TXD"). The IO5 wire is the one that carries data; IO17 is only needed if you want to send config to the GPS.
 - Power the GPS from the WT32's **3V3** output pin, not 5V, so an active 3.3V-bias antenna sees its rated voltage.
-- Power the WT32 from the buck's **5V** out into the WT32 **5V** pin. The Ethernet PHY is power-hungry and needs a solid 5V source.
+- During flashing (stage B) you power the board from the **FTDI's VCC into the WT32 3V3 pin**, with the FTDI switch at 3.3V; the Ethernet PHY is idle then, so this is fine. When you switch to operation (stage C) you power the WT32 from the buck's **5V** into the WT32 **5V** pin, and you **remove the FTDI VCC wire**. The PHY is power-hungry and needs a solid, single 5V source, so two supplies on the rail are what to avoid.
 - Tap coach 12V through an **inline ~1A fuse** into the buck.
 
 ## Firmware and flashing
@@ -75,6 +75,8 @@ Two things trip people up:
 - **The WT32-ETH01 has no USB port and no auto-reset circuit.** You flash it through the FTDI on UART0, and you enter the bootloader by hand: jumper **IO0 -> GND**, click Upload, and when the IDE prints `Connecting....`, **power-cycle the board**. It catches it in download mode. Remove the IO0 jumper and power-cycle again to run.
 - **Two different bauds, do not mix them up.** **9600** is the internal GPS-to-ESP link (UART2). **115200** is the USB debug console (the Serial Monitor). Gibberish on the monitor almost always means it is set to the wrong baud.
 
+Power during flashing comes from the FTDI: with the FTDI switch at 3.3V, run **FTDI VCC into the WT32 3V3 pin**. That is fine while flashing because the Ethernet PHY is idle. When you move to operation and feed the buck's 5V into the 5V pin, **remove the FTDI VCC wire** so two supplies are not fighting on the rail. Details are in `firmware/README.md`.
+
 Settings you edit at the top of the sketch: `PEPLINK_IP` (your Peplink's LAN IP), `PEPLINK_PORT`, and `USE_TCP` (0 for UDP, the default; 1 for a TCP client).
 
 ## Peplink configuration
@@ -83,7 +85,7 @@ Router-side setup is in **`docs/peplink-config.md`**. In brief: **Advanced > "GP
 
 ## Bring-up and troubleshooting
 
-A walkthrough of every snag we hit, and why, is in **`docs/troubleshooting.md`**. The short list: listener-vs-client roles, the SMA-vs-patch antenna trap, the manual bootloader, the **FTDI VCC backfeed that starves the Ethernet PHY and leaves you with no link light**, the IO5 strapping pin, antenna bias voltage, and the fact that **InControl lags by minutes, which is normal, so confirm on the Status-page map instead**.
+A walkthrough of the snags worth expecting, and why, is in **`docs/troubleshooting.md`**. The short list: listener-vs-client roles, the SMA-vs-patch antenna trap, the manual bootloader, the **FTDI VCC backfeed that starves the Ethernet PHY and leaves you with no link light** if you leave it connected after switching to 5V, the IO5 strapping pin, antenna bias voltage, and the fact that **InControl lags by minutes, which is normal, so confirm on the Status-page map instead**.
 
 ## Enclosure and STLs
 
@@ -91,15 +93,16 @@ Printable STLs are in **`enclosure/`**. The starting point was a small box for t
 
 - Final printable files: `enclosure/Case_wide_30mm_clean.stl` and `enclosure/Lid_wide_30mm.stl`.
 - The GPS can be **fully enclosed** with no view of the sky, because it runs off the roof antenna over the SMA, not its onboard patch.
-- See `enclosure/README.md` for print orientation and a note that these are mesh-only (no parametric CAD source).
+- See `enclosure/README.md` for print orientation, the credit lineage, and a note that these are mesh-only (no parametric CAD source).
 
 ## License
 
 - **Firmware** (`firmware/`): MIT, see `LICENSE`.
-- **3D models and documentation** (`enclosure/`, `docs/`, this README): Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0), see `LICENSE-hardware`.
+- **3D models and documentation** (`enclosure/`, `docs/`, this README): Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0), see `LICENSE-hardware`. The enclosure is a remix of upstream NonCommercial work, so these may not be used commercially.
 
 ## Credits and sources
 
 - **WT32-ETH01 pinout and Ethernet bring-up**: Werner Rothschopf's excellent WT32-ETH01 reference, which nails the second-UART pins (IO5 / IO17) and the LAN8720 setup. https://werner.rothschopf.net/microcontroller/202401_esp32_wt32_eth01_en.htm
 - **The UDP-working case on the B One 5G**: a Peplink community forum thread documenting a working raw-NMEA-over-UDP feed to a B One 5G, which confirmed UDP as the simplest reliable transport and the listener-vs-client roles.
+- **Enclosure lineage**: the case is a remix of **Jahara**'s "WT32-ETH01 FT232 Snap Fit Case" on MakerWorld (https://makerworld.com/en/models/1920953-wt32-eth01-ft232-snap-fit-case), which is itself a remix of **Hans** (@Hans_193091)'s "Esp32 WT32-ETH01 USB Type C Snap Fit Case" on Printables (https://www.printables.com/model/770916-esp32-wt32-eth01-usb-type-c-snap-fit-case). Both are licensed CC BY-NC-SA 4.0. See `enclosure/README.md` and `LICENSE-hardware`.
 - Built and documented for a motorhome install. Shared in case it saves the next person the same afternoon of debugging.
