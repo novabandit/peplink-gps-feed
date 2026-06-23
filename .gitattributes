@@ -1,0 +1,4 @@
+# This repo is a hardware build guide (docs + STLs) with one Arduino sketch.
+# Exclude the firmware from GitHub's language stats so the repo isn't badged
+# as a C++ project. (Linguist classifies .ino as C++.)
+*.ino linguist-detectable=false
